@@ -47,7 +47,7 @@ class ViewController: UIViewController {
             printNumber()
         }
     }
-    
+    //Test
     @IBAction func calculate(sender : UIButton) {
         num2 = Int(theNumber)!
         
