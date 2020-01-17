@@ -17,8 +17,9 @@ class ViewController: UIViewController {
     
     @IBOutlet var lbText : UILabel!
     var theNumber : String = "0"
-    var num1 = 0
-    var num2 = 0
+    var trailingNumber : String = "0"
+    var num1 : Double = 0
+    var num2 : Double = 0
     var operand = 0
     var PLUS = 0
     var MINUS = 1
@@ -29,27 +30,44 @@ class ViewController: UIViewController {
     
     @IBAction func pressNum(sender : UIButton) {
         if sender.tag >= 0 && sender.tag <= 9 {
-            theNumber += String(sender.tag)
+            if theNumber == "0" && trailingNumber == "0"{
+                theNumber = String(sender.tag)
+            } else {
+                theNumber += String(sender.tag)
+                trailingNumber = "0"
+            }
             printNumber()
         }
     }
     
     func printNumber() {
-        lbText.text = theNumber
+        lbText.text = trailingNumber != "0" ? theNumber + trailingNumber : theNumber
+        theNumber = lbText.text!
     }
     
     
     @IBAction func setOperand(sender : UIButton) {
         if  sender.tag >= PLUS && sender.tag <= DIVIDE {
             operand = sender.tag
-            num1 = Int(theNumber)!
-            theNumber = "0"
+           
+            num1 = Double(theNumber)!
+            
+            if operand == PLUS {
+                trailingNumber = " + "
+            } else if operand == MINUS {
+                trailingNumber = " - "
+            } else if operand == MULTIPLY {
+                trailingNumber = " * "
+            } else {
+                trailingNumber = " \\ "
+            }
             printNumber()
         }
     }
     //Test
     @IBAction func calculate(sender : UIButton) {
-        num2 = Int(theNumber)!
+        let aa = theNumber.components(separatedBy: " ").last!
+        num2 = Double(aa)!
         
         if operand == PLUS {
             answer = Double(num1 + num2)
@@ -73,6 +91,10 @@ class ViewController: UIViewController {
         num2 = 0
         answer = 0.0
         operand = 0
+    }
+    
+    @IBAction func clear(sender : UIButton) {
+        theNumber = "0"
     }
 }
 
