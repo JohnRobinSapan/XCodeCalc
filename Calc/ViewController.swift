@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     }
     
     @IBOutlet var lbText : UILabel!
+    @IBOutlet var lbAnswer : UILabel!
     var theNumber : String = "0"
     var trailingNumber : String = "0"
     var num1 : Double = 0
@@ -26,6 +27,7 @@ class ViewController: UIViewController {
     var MULTIPLY = 2
     var DIVIDE = 3
     var answer : Double = 0
+    var operandSet = false
   
     
     @IBAction func pressNum(sender : UIButton) {
@@ -36,6 +38,10 @@ class ViewController: UIViewController {
                 theNumber += String(sender.tag)
                 trailingNumber = "0"
             }
+            if operandSet {
+                lbAnswer.text = ""
+            }
+            operandSet = false;
             printNumber()
         }
     }
@@ -45,13 +51,17 @@ class ViewController: UIViewController {
         theNumber = lbText.text!
     }
     
+    func getAnswer() -> String {
+        
+        return ""
+    }
     
     @IBAction func setOperand(sender : UIButton) {
-        if  sender.tag >= PLUS && sender.tag <= DIVIDE {
+        if  sender.tag >= PLUS && sender.tag <= DIVIDE && !operandSet{
             operand = sender.tag
            
             num1 = Double(theNumber)!
-            
+            operandSet = true
             if operand == PLUS {
                 trailingNumber = " + "
             } else if operand == MINUS {
@@ -86,7 +96,10 @@ class ViewController: UIViewController {
         }
         theNumber = String(answer)
         printNumber()
-        
+        reset()
+    }
+    
+    func reset() {
         num1 = 0
         num2 = 0
         answer = 0.0
@@ -94,7 +107,10 @@ class ViewController: UIViewController {
     }
     
     @IBAction func clear(sender : UIButton) {
+        reset()
         theNumber = "0"
+        trailingNumber = "0"
+        printNumber()
     }
 }
 
