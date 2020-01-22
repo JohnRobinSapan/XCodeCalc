@@ -16,6 +16,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         lbText.adjustsFontSizeToFitWidth = true;
+        lbAnswer.adjustsFontSizeToFitWidth = true;
     }
     
     @IBOutlet var lbText : UILabel!
@@ -26,8 +27,6 @@ class ViewController: UIViewController {
     var MINUS = 1
     var MULTIPLY = 2
     var DIVIDE = 3
-    var answer : Double = 0
-    var operandSet = false
     
     var operations : [String] = []
     var nums : [Double] = []
@@ -57,18 +56,15 @@ class ViewController: UIViewController {
             }
         }
         lbText.text = numField
-        var result = nums[0];
-        print(nums)
-        print(operations)
-        lbAnswer.text = "\(getAnswer(&result, i: 0).clean)"
+        if nums.count >= 2{
+            var result = nums[0]
+            lbAnswer.text = "\(getAnswer(&result, i: 0).clean)"
+        }
     }
     
     @IBAction func setOperand(sender : UIButton) {
         if  sender.tag >= PLUS && sender.tag <= DIVIDE{
             operand = sender.tag
-            
-     
-            
             
             var tempField = numField.split(separator: " ");
             
@@ -92,93 +88,56 @@ class ViewController: UIViewController {
                 numField += " / "
             }
             
-           
-            
             updateField()
-            
-            
         }
     }
     
     func getAnswer(_ result : inout Double, i : Int) -> Double {
-        //        if let num12 = Double(theNumber.components(separatedBy: " ").last!) {
-        //            print(num2)
-        //            if operand == PLUS {
-        //                answer = Double(num1 + num12)
-        //            } else if operand == MINUS {
-        //                answer = Double(num1 - num12)
-        //            } else if operand == MULTIPLY {
-        //                answer = Double(num1 * num12)
-        //            } else {
-        //                if num12 == 0 {
-        //                    let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
-        //                    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        //                    present(alert, animated: true)
-        //                } else {
-        //                    answer = Double(num1) / Double(num12)
-        //                }
-        //            }
-        //
-        //
-        //
-        //        }
-        //print("\(result)  \(i)  \(operations.count)")
-        if i == operations.count || (operations.count >= nums.count){
+        if i == operations.count || nums.count - 1 == i{
             return result;
         }
+        print("\(i) \(nums) \(nums.count)")
         switch operations[i] {
         case "+":
             result += nums[i + 1]
-            print("\(i) \(result) \(nums[i]) \(nums[i+1])")
+            print("\(i) \(result) \(nums[i+1])")
         case "-":
             result -= nums[i + 1]
         case "*":
             result *= nums[i + 1]
         case "/":
-            result /= nums[i + 1]
+            if nums[i + 1] == 0 {
+                let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                present(alert, animated: true)
+                alert.addAction(cancelAction)
+            } else {
+                result /= nums[i + 1]
+            }
         default:
             result = 0.0
         }
         return getAnswer(&result, i: i + 1)
     }
-
     
-    //Test
     @IBAction func calculate(sender : UIButton) {
-        //        let aa = theNumber.components(separatedBy: " ").last!
-        //        num2 = Double(aa)!
-        //
-        //        if operand == PLUS {
-        //            answer = Double(num1 + num2)
-        //        } else if operand == MINUS {
-        //            answer = Double(num1 - num2)
-        //        } else if operand == MULTIPLY {
-        //            answer = Double(num1 * num2)
-        //        } else {
-        //            if num2 == 0 {
-        //                let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
-        //                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        //                present(alert, animated: true)
-        //            } else {
-        //                answer = Double(num1) / Double(num2)
-        //            }
-        //        }
-        //        theNumber = String(answer)
-       
+        numField = lbAnswer.text != "" ? lbAnswer.text! : numField
+        print(nums)
+        print(operations)
+        reset()
         updateField()
-        //reset()
     }
     
     func reset() {
         print("Cleared")
         operations = []
-        numField = "0"
         nums = []
         operand = 0
         lbAnswer.text = ""
     }
     
     @IBAction func clear(sender : UIButton) {
+        numField = "0"
         reset()
         updateField()
     }
