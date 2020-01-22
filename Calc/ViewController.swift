@@ -96,11 +96,11 @@ class ViewController: UIViewController {
         if i == operations.count || nums.count - 1 == i{
             return result;
         }
-        print("\(i) \(nums) \(nums.count)")
+        //print("\(i) \(nums) \(nums.count)")
         switch operations[i] {
         case "+":
             result += nums[i + 1]
-            print("\(i) \(result) \(nums[i+1])")
+           // print("\(i) \(result) \(nums[i+1])")
         case "-":
             result -= nums[i + 1]
         case "*":
