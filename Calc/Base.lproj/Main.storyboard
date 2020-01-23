@@ -133,7 +133,7 @@
                                     <action selector="clearWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="guz-rZ-Ma1"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" tag="3" contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fHY-9Q-QBp">
+                            <button opaque="NO" tag="10" contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fHY-9Q-QBp">
                                 <rect key="frame" x="208" y="704" width="103" height="103"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="0.78173421830000001" blue="0.017943376130000001" alpha="0.84705882349999995" colorSpace="custom" customColorSpace="sRGB"/>
@@ -141,6 +141,9 @@
                                 <state key="normal" title=".">
                                     <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
                                 </state>
+                                <connections>
+                                    <action selector="numPressWithSender:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WYA-gt-044"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5nm-Gd-w0x">
                                 <rect key="frame" x="104" y="704" width="103" height="103"/>

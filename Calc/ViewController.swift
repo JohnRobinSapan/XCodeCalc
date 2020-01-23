@@ -28,7 +28,7 @@ class ViewController: UIViewController {
     var MULTIPLY = 2
     var DIVIDE = 3
 
-    var answer = 0.0
+    var answer : Double? = 0
     var postfix : [String] = []
     var infix : String = "0"
     
@@ -40,8 +40,11 @@ class ViewController: UIViewController {
             } else {
                 infix += String(sender.tag)
             }
-            updateField()
         }
+        if sender.tag == 10 {
+            infix += "."
+        }
+        updateField()
     }
     
    
@@ -51,7 +54,7 @@ class ViewController: UIViewController {
         var stack : [String] = []
         for field in infix.split(separator: " ") {
             //print(field)
-            if let num = Double(field) {
+            if let _ = Double(field) {
                 postfix.append(String(field))
             } else {
                 if field == "+" || field == "-"{
@@ -65,10 +68,16 @@ class ViewController: UIViewController {
         while let pop = stack.popLast(){
             postfix.append(pop)
         }
-        print("Stack: \(stack)\nPostfix: \(postfix)")
+        print("Infix: \(infix)\nPostfix: \(postfix)")
         if postfix.count >= 3 {
             evaluatePostfix()
-            lbAnswer.text = "\(answer.clean)"
+            var result = ""
+            if let finalAnswer = answer?.clean {
+                result = "\(finalAnswer)"
+            } else {
+                result = "Error"
+            }
+            lbAnswer.text = result
         }
         lbText.text = infix
     }
@@ -76,8 +85,6 @@ class ViewController: UIViewController {
 //    @IBAction func setNegative(sender : UIButton) {
 //        if sender.tag =
 //    }
-    
-    
     
     @IBAction func setOperand(sender : UIButton) {
         if  sender.tag >= PLUS && sender.tag <= DIVIDE{
@@ -88,21 +95,19 @@ class ViewController: UIViewController {
             if tempField.last! == "+" || tempField.last! == "-" || tempField.last! == "*" || tempField.last! == "/" {
                 tempField.removeLast()
             }
-            
-            //print(tempField)
             infix = ""
             for test in tempField {
                 infix += test + " "
             }
             
             if operand == PLUS {
-                infix += " + "
+                infix += "+ "
             } else if operand == MINUS {
-                infix += " - "
+                infix += "- "
             } else if operand == MULTIPLY {
-                infix += " * "
+                infix += "* "
             } else {
-                infix += " / "
+                infix += "/ "
             }
             
             updateField()
@@ -123,31 +128,35 @@ class ViewController: UIViewController {
         }
         if numCount > operandCount {
             for token in postfix {
+//                print("Stack: \(stack)")
                 switch token {
                 case "+":
-                    stack[0] += stack[1]
-                    stack.remove(at: 1)
+                    stack[1] += stack[0]
+                    stack.remove(at: 0)
                 case "-":
-                    stack[0] -= stack[1]
-                    stack.remove(at: 1)
+                    stack[1] -= stack[0]
+                    stack.remove(at: 0)
                 case "*":
-                    stack[0] *= stack[1]
-                    stack.remove(at: 1)
+                    stack[1] *= stack[0]
+                    stack.remove(at: 0)
                 case "/":
-                    if stack[1] == 0 {
+                    if stack[0] == 0 {
                         let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
                         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
                         present(alert, animated: true)
                         alert.addAction(cancelAction)
+                        answer = nil
+                        return
                     } else {
-                         stack[0] /= stack[1]
+                         stack[1] /= stack[0]
                     }
-                    stack.remove(at: 1)
+                    stack.remove(at: 0)
                 default:
                    stack.insert(Double(token)!, at: 0)
                 }
             }
         }
+        
         if stack.count == 1 {
             answer = stack[0]
         }
