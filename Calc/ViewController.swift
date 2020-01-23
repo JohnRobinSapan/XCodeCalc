@@ -27,117 +27,149 @@ class ViewController: UIViewController {
     var MINUS = 1
     var MULTIPLY = 2
     var DIVIDE = 3
-    
-    var operations : [String] = []
-    var nums : [Double] = []
-    var numField : String = "0"
+
+    var answer = 0.0
+    var postfix : [String] = []
+    var infix : String = "0"
     
     
     @IBAction func numPress(sender : UIButton) {
         if sender.tag >= 0 && sender.tag <= 9 {
-            if numField == "0"{
-                numField = String(sender.tag)
+            if infix == "0"{
+                infix = String(sender.tag)
             } else {
-                numField += String(sender.tag)
+                infix += String(sender.tag)
             }
             updateField()
         }
     }
     
+   
+    
     func updateField() {
-        nums.removeAll()
-        operations.removeAll()
-        for field in numField.split(separator: " ") {
+        postfix.removeAll()
+        var stack : [String] = []
+        for field in infix.split(separator: " ") {
             //print(field)
             if let num = Double(field) {
-                nums.append(num)
+                postfix.append(String(field))
             } else {
-                operations.append(String(field))
+                if field == "+" || field == "-"{
+                    while let pop = stack.popLast(){
+                        postfix.append(pop)
+                    }
+                }
+                stack.append(String(field))
             }
         }
-        lbText.text = numField
-        if nums.count >= 2{
-            var result = nums[0]
-            lbAnswer.text = "\(getAnswer(&result, i: 0).clean)"
+        while let pop = stack.popLast(){
+            postfix.append(pop)
         }
+        print("Stack: \(stack)\nPostfix: \(postfix)")
+        if postfix.count >= 3 {
+            evaluatePostfix()
+            lbAnswer.text = "\(answer.clean)"
+        }
+        lbText.text = infix
     }
+    
+//    @IBAction func setNegative(sender : UIButton) {
+//        if sender.tag =
+//    }
+    
+    
     
     @IBAction func setOperand(sender : UIButton) {
         if  sender.tag >= PLUS && sender.tag <= DIVIDE{
             operand = sender.tag
             
-            var tempField = numField.split(separator: " ");
+            var tempField = infix.split(separator: " ");
             
             if tempField.last! == "+" || tempField.last! == "-" || tempField.last! == "*" || tempField.last! == "/" {
                 tempField.removeLast()
             }
             
             //print(tempField)
-            numField = ""
+            infix = ""
             for test in tempField {
-                numField += test + " "
+                infix += test + " "
             }
             
             if operand == PLUS {
-                numField += " + "
+                infix += " + "
             } else if operand == MINUS {
-                numField += " - "
+                infix += " - "
             } else if operand == MULTIPLY {
-                numField += " * "
+                infix += " * "
             } else {
-                numField += " / "
+                infix += " / "
             }
             
             updateField()
         }
     }
     
-    func getAnswer(_ result : inout Double, i : Int) -> Double {
-        if i == operations.count || nums.count - 1 == i{
-            return result;
-        }
-        //print("\(i) \(nums) \(nums.count)")
-        switch operations[i] {
-        case "+":
-            result += nums[i + 1]
-           // print("\(i) \(result) \(nums[i+1])")
-        case "-":
-            result -= nums[i + 1]
-        case "*":
-            result *= nums[i + 1]
-        case "/":
-            if nums[i + 1] == 0 {
-                let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
-                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-                present(alert, animated: true)
-                alert.addAction(cancelAction)
-            } else {
-                result /= nums[i + 1]
+    func evaluatePostfix(){
+        var stack : [Double] = []
+        var operandCount = 0
+        var numCount = 0
+        for token in postfix {
+            switch token {
+            case "+","-","*","/":
+                operandCount += 1
+            default:
+                numCount += 1
             }
-        default:
-            result = 0.0
         }
-        return getAnswer(&result, i: i + 1)
+        if numCount > operandCount {
+            for token in postfix {
+                switch token {
+                case "+":
+                    stack[0] += stack[1]
+                    stack.remove(at: 1)
+                case "-":
+                    stack[0] -= stack[1]
+                    stack.remove(at: 1)
+                case "*":
+                    stack[0] *= stack[1]
+                    stack.remove(at: 1)
+                case "/":
+                    if stack[1] == 0 {
+                        let alert = UIAlertController(title: "Error", message: "Cannot divide by 0", preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                        present(alert, animated: true)
+                        alert.addAction(cancelAction)
+                    } else {
+                         stack[0] /= stack[1]
+                    }
+                    stack.remove(at: 1)
+                default:
+                   stack.insert(Double(token)!, at: 0)
+                }
+            }
+        }
+        if stack.count == 1 {
+            answer = stack[0]
+        }
     }
     
+    
     @IBAction func calculate(sender : UIButton) {
-        numField = lbAnswer.text != "" ? lbAnswer.text! : numField
-        print(nums)
-        print(operations)
+        infix = lbAnswer.text != "" ? lbAnswer.text! : infix
         reset()
         updateField()
     }
     
     func reset() {
         print("Cleared")
-        operations = []
-        nums = []
+        postfix = []
         operand = 0
+        answer = 0
         lbAnswer.text = ""
     }
     
     @IBAction func clear(sender : UIButton) {
-        numField = "0"
+        infix = "0"
         reset()
         updateField()
     }
