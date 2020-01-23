@@ -27,9 +27,11 @@ class ViewController: UIViewController {
     var MINUS = 1
     var MULTIPLY = 2
     var DIVIDE = 3
-
+    
     var answer : Double? = 0
     var postfix : [String] = []
+    var nums : [String] = ["0"]
+    var operators : [String] = []
     var infix : String = "0"
     
     
@@ -42,31 +44,66 @@ class ViewController: UIViewController {
             }
         }
         if sender.tag == 10 {
-            infix += "."
+            if nums.count == operators.count {
+                infix += "0"
+            }
+            if !(nums.last?.contains("."))! || nums.count == operators.count {
+                infix += "."
+            }
         }
         updateField()
     }
     
-   
+    func preced(ch : String) -> Int{
+        if(ch == "+" || ch == "-") {
+            return 1;              //Precedence of + or - is 1
+        }else if(ch == "*" || ch == "/") {
+            return 2;            //Precedence of * or / is 2
+        }else if(ch == "^") {
+            return 3;            //Precedence of ^ is 3
+        }else {
+            return 0;
+        }
+    }
     
     func updateField() {
         postfix.removeAll()
-        var stack : [String] = []
+        nums.removeAll()
+        operators.removeAll()
+        var stack : [String] = ["#"]
         for field in infix.split(separator: " ") {
             //print(field)
             if let _ = Double(field) {
                 postfix.append(String(field))
-            } else {
-                if field == "+" || field == "-"{
-                    while let pop = stack.popLast(){
-                        postfix.append(pop)
-                    }
-                }
+                nums.append(String(field))
+            } else if field == "^" || field == "("  {
                 stack.append(String(field))
+            } else if field == ")"{
+                while stack.last != "#" && stack.last != "(" {
+                    postfix.append(stack.last!)
+                    operators.append(stack.last!)
+                    stack.removeLast()
+                }
+                stack.removeLast()
+            } else {
+                if preced(ch: String(field)) > preced(ch: stack.last!) {
+                    stack.append(String(field))
+                } else {
+                    while stack.last != "#" && preced(ch:String(field)) <= preced(ch: stack.last!) {
+                        postfix.append(stack.last!)
+                        operators.append(stack.last!)
+                        stack.removeLast()
+                    }
+                    stack.append(String(field))
+                }
             }
+            
+            print(stack)
+            
         }
-        while let pop = stack.popLast(){
+        while let pop = stack.popLast(), pop != "#"{
             postfix.append(pop)
+            operators.append(pop)
         }
         print("Infix: \(infix)\nPostfix: \(postfix)")
         if postfix.count >= 3 {
@@ -82,9 +119,9 @@ class ViewController: UIViewController {
         lbText.text = infix
     }
     
-//    @IBAction func setNegative(sender : UIButton) {
-//        if sender.tag =
-//    }
+    //    @IBAction func setNegative(sender : UIButton) {
+    //        if sender.tag =
+    //    }
     
     @IBAction func setOperand(sender : UIButton) {
         if  sender.tag >= PLUS && sender.tag <= DIVIDE{
@@ -116,19 +153,10 @@ class ViewController: UIViewController {
     
     func evaluatePostfix(){
         var stack : [Double] = []
-        var operandCount = 0
-        var numCount = 0
-        for token in postfix {
-            switch token {
-            case "+","-","*","/":
-                operandCount += 1
-            default:
-                numCount += 1
-            }
-        }
-        if numCount > operandCount {
+        
+        if nums.count > operators.count {
             for token in postfix {
-//                print("Stack: \(stack)")
+                //print("Stack: \(stack)")
                 switch token {
                 case "+":
                     stack[1] += stack[0]
@@ -137,6 +165,7 @@ class ViewController: UIViewController {
                     stack[1] -= stack[0]
                     stack.remove(at: 0)
                 case "*":
+                    //print(stack)
                     stack[1] *= stack[0]
                     stack.remove(at: 0)
                 case "/":
@@ -148,17 +177,17 @@ class ViewController: UIViewController {
                         answer = nil
                         return
                     } else {
-                         stack[1] /= stack[0]
+                        stack[1] /= stack[0]
                     }
                     stack.remove(at: 0)
                 default:
-                   stack.insert(Double(token)!, at: 0)
+                    stack.insert(Double(token)!, at: 0)
                 }
             }
         }
         
         if stack.count == 1 {
-            answer = stack[0]
+            answer = stack[0].rounded
         }
     }
     
@@ -187,5 +216,10 @@ class ViewController: UIViewController {
 extension Double {
     var clean: String {
         return self.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", self) : String(self)
+    }
+    // Round to avoid the dreaded 0.1 + 0.2
+    var rounded : Double {
+        let divisor = pow(10.0, Double(15))
+        return (self * divisor).rounded() / divisor
     }
 }
